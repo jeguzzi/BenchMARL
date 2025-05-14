@@ -232,6 +232,15 @@ class Logger:
             td.batch_size[0] for td in rollouts
         ) / len(rollouts)
 
+        for group in self.group_map.keys():
+            is_success = [td.get(("next", group, "info", "is_success"))[-1].numpy()
+                          for td in rollouts
+                          if ("next", group, "info", "is_success") in td]
+            if is_success:
+                success = np.concatenate(is_success)
+                success_rate = sum(success > 0) / len(success)
+                to_log[f"eval/{group}/success_rate"] = success_rate
+
         if self.json_writer is not None:
             self.json_writer.write(
                 metrics=json_metrics,
