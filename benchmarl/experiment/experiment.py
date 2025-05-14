@@ -443,7 +443,7 @@ class Experiment(CallbackNotifier):
             )
 
     def _setup_task(self):
-        test_env = self.task.get_env_fun(
+        test_env = self.task.get_eval_env_fun(
             num_envs=self.config.evaluation_episodes,
             continuous_actions=self.continuous_actions,
             seed=self.seed,

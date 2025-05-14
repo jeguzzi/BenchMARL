@@ -103,6 +103,39 @@ class TaskClass(abc.ABC):
         """
         raise NotImplementedError
 
+    def get_eval_env_fun(
+        self,
+        num_envs: int,
+        continuous_actions: bool,
+        seed: Optional[int],
+        device: DEVICE_TYPING,
+    ) -> Callable[[], EnvBase]:
+        """
+        This function is used to obtain a TorchRL object from the enum Task,
+        similar to :py:meth:`get_env_fun` but to create testing/evaluation environments.
+
+        The default implementation returns :py:meth:`get_env_fun`.
+        If you don't override it, the same function will be used to
+        create train and test environments.
+
+        If you do override it, it should create environments that are compatible
+        (same action and observation spaces) as :py:meth:`get_env_fun`.
+
+        Args:
+            num_envs (int): The number of envs that should be in the batch_size of the returned env.
+                In vectorized envs, this can be used to set the number of batched environments.
+                If your environment is not vectorized, you can just ignore this, and it will be
+                wrapped in a :class:`torchrl.envs.SerialEnv` with num_envs automatically.
+            continuous_actions (bool): Whether your environment should have continuous or discrete actions.
+                If your environment does not support both, ignore this and refer to the supports_x_actions methods.
+            seed (optional, int): The seed of your env
+            device (str): the device of your env, you can pass this to any torchrl env constructor
+
+        Returns: a function that takes no arguments and returns a :class:`torchrl.envs.EnvBase` object
+
+        """
+        return self.get_env_fun(num_envs, continuous_actions, seed, device)
+
     @abstractmethod
     def supports_continuous_actions(self) -> bool:
         """
